@@ -14,13 +14,18 @@ let sources = {
     }
 };
 
-gulp.task('manageServer', manageServer);
-gulp.task('runUnitTests', runUnitTests);
-gulp.task('runIntegrationTests', runIntegrationTests);
-gulp.task('develop', gulp.series('manageServer', 'runUnitTests'));
-gulp.task('e2e-tests', gulp.series('manageServer', 'runIntegrationTests'));
+gulp.task('serverManager', serverManager);
+gulp.task('unitTestManager', unitTestManager);
+gulp.task('integrationTestManager', integrationTestManager);
+gulp.task(
+    'develop',
+    gulp.series(
+        'serverManager',
+        gulp.parallel('unitTestManager', 'integrationTestManager')
+    )
+);
 
-function runUnitTests(done) {
+function unitTestManager(done) {
     return gulp.watch(
         [`${sources.scripts.path}/*.spec.js`],
         {ignoreInitial: true},
@@ -40,14 +45,14 @@ function runUnitTests(done) {
     }
 }
 
-function runIntegrationTests(done) {
+function integrationTestManager(done) {
     return gulp.watch(
         [`${sources.e2e.path}/*.spec.js`],
         {ignoreInitial: true},
-        runUnitTests
+        runIntegrationTests
     );
 
-    function runUnitTests(done) {
+    function runIntegrationTests(done) {
         return gulp
             .src([`${sources.e2e.path}/*.spec.js`])
             .pipe(mocha({reporter: 'list', bail: true}))
@@ -60,17 +65,17 @@ function runIntegrationTests(done) {
     }
 }
 
-function manageServer(done) {
+function serverManager(done) {
     gulp.watch(
         ['./index.js', `${sources.scripts.path}`],
         {
             ignoreInitial: false,
             ignored: ['**/*.spec.js']
         },
-        runServer
+        reloadServer
     );
     done();
-    function runServer(done) {
+    function reloadServer(done) {
         if (node) node.kill();
         node = spawn('node', ['index.js'], {stdio: 'inherit'});
         node.on('close', function(code) {
