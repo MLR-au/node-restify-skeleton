@@ -6,7 +6,6 @@
     "scripts": {
         "develop": "node_modules/gulp/bin/gulp.js develop",
         "build": "",
-        "e2e-tests": "node_modules/gulp/bin/gulp.js e2e-tests",
         "lint": ""
     },
     "repository": {
