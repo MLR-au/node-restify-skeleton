@@ -16,12 +16,12 @@ let sources = {
 
 gulp.task('manageServer', manageServer);
 gulp.task('runUnitTests', runUnitTests);
-gulp.task('develop', gulp.parallel('manageServer', 'runUnitTests'));
+gulp.task('develop', gulp.series('manageServer', 'runUnitTests'));
 
 function runUnitTests(done) {
     return gulp.watch(
-        `${sources.scripts.path}/*.spec.js`,
-        {ignoreInitial: false},
+        [`${sources.scripts.path}/*.spec.js`],
+        {ignoreInitial: true},
         runUnitTests
     );
 
@@ -38,15 +38,16 @@ function runUnitTests(done) {
     }
 }
 
-function manageServer() {
-    return gulp.watch(
-        ['./index.js', `${sources.scripts.path}/*.js`],
+function manageServer(done) {
+    gulp.watch(
+        ['./index.js', `${sources.scripts.path}`],
         {
             ignoreInitial: false,
             ignored: ['**/*.spec.js']
         },
         runServer
     );
+    done();
     function runServer(done) {
         if (node) node.kill();
         node = spawn('node', ['index.js'], {stdio: 'inherit'});
