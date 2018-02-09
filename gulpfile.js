@@ -16,7 +16,9 @@ let sources = {
 
 gulp.task('manageServer', manageServer);
 gulp.task('runUnitTests', runUnitTests);
+gulp.task('runIntegrationTests', runIntegrationTests);
 gulp.task('develop', gulp.series('manageServer', 'runUnitTests'));
+gulp.task('e2e-tests', gulp.series('manageServer', 'runIntegrationTests'));
 
 function runUnitTests(done) {
     return gulp.watch(
@@ -28,6 +30,26 @@ function runUnitTests(done) {
     function runUnitTests(done) {
         return gulp
             .src([`${sources.scripts.path}/*.spec.js`])
+            .pipe(mocha({reporter: 'list', bail: true}))
+            .on('error', function(err) {
+                console.log(err.stack);
+            })
+            .once('end', function() {
+                done();
+            });
+    }
+}
+
+function runIntegrationTests(done) {
+    return gulp.watch(
+        [`${sources.e2e.path}/*.spec.js`],
+        {ignoreInitial: true},
+        runUnitTests
+    );
+
+    function runUnitTests(done) {
+        return gulp
+            .src([`${sources.e2e.path}/*.spec.js`])
             .pipe(mocha({reporter: 'list', bail: true}))
             .on('error', function(err) {
                 console.log(err.stack);
