@@ -18,5 +18,10 @@ module.exports = {
     plugins: [new webpack.DefinePlugin({'global.GENTLY': false})],
     module: {
         noParse: [/dtrace-provider/, /safe-json-stringify/, /mv/]
+    },
+    resolve: {
+        alias: {
+            src: path.resolve(__dirname, 'src')
+        }
     }
 };
