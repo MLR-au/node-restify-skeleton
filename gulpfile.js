@@ -34,8 +34,11 @@ function unitTestManager(done) {
 
     function runUnitTests(done) {
         return gulp
-            .src([`${sources.scripts.path}/*.spec.js`])
-            .pipe(mocha({reporter: 'min', bail: true, exit: true}))
+            .src([
+                `${sources.scripts.path}/*.spec.js`,
+                '!src/common/node_modules/**/*.spec.js'
+            ])
+            .pipe(mocha({bail: true, exit: true}))
             .on('error', function(err) {
                 console.log(err.stack);
             })
@@ -55,7 +58,7 @@ function integrationTestManager(done) {
     function runIntegrationTests(done) {
         return gulp
             .src([`${sources.e2e.path}/*.spec.js`])
-            .pipe(mocha({reporter: 'min', bail: true, exit: true}))
+            .pipe(mocha({bail: true, exit: true}))
             .on('error', function(err) {
                 console.log(err.stack);
             })
